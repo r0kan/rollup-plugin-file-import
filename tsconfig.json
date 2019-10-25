@@ -4,7 +4,7 @@
     "jsx": "react",
     "target": "esnext",
     "module": "esnext",
-    "declaration": false,
+    "declaration": true,
     "strict": true,
     "importHelpers": true,
     "noUnusedLocals": true,

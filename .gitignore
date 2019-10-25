@@ -1,5 +1,5 @@
+.idea
 node_modules
 dist
-jest-cache
-.idea
-tmp
+jest/cache
+test/tmp

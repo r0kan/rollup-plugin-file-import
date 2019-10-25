@@ -1,61 +1,38 @@
-import fs from 'fs';
-import fsExtra from 'fs-extra';
+// [libs]
 import path from 'path';
 import { createFilter } from 'rollup-pluginutils';
 import { Plugin, OutputOptions, OutputBundle } from 'rollup';
 
-const extensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg'];
-const includes = extensions.map(e => `**/*${e}`);
-const outputDir = 'images';
+// [modules]
+import { Files } from './Files';
 
-type TConfigItem = {
-  outputDir: string;
-  extensions: string[];
-};
+// types
+import { TPluginConfigItem } from './types';
 
-type TFileInfo = {
-  id: string;
-  path: string;
-  name: string;
-};
+function createPluginFile(config: TPluginConfigItem[]): Plugin {
+  const includes = config.reduce<string[]>((res, i) => res.concat(i.extensions), []).map(e => `**/*${e}`);
 
-function createPluginFile(_config: TConfigItem): Plugin {
   const filter = createFilter(includes);
 
-  const fileMap: Map<string, TFileInfo> = new Map();
+  const files = new Files(config);
 
   return {
     name: 'file',
-    load(id) {
-      if (!filter(id)) {
+    load(filePath: string) {
+      if (!filter(filePath)) {
         return null;
       }
-
-      if (!fileMap.has(id)) {
-        fileMap.set(id, {
-          id: id,
-          path: id,
-          name: path.basename(id),
-        });
-      }
-      return `const file = require('#${id}#'); export default file;`;
+      return files.createExport(filePath);
     },
     generateBundle(options: OutputOptions, bundle: OutputBundle) {
+      const bundleDir = options.dir || (options.file ? path.dirname(options.file) : __dirname);
+
       Object.values(bundle).map(i => {
         if (i.type === 'chunk') {
-          fileMap.forEach(fileInfo => {
-            i.code = i.code.replace(`#${fileInfo.id}#`, `../images/${fileInfo.name}`);
-          });
+          files.prepareChunk(i, bundleDir);
         }
       });
-      let dir = options.dir || (options.file ? path.dirname(options.file) : __dirname);
-      dir = `${dir}/${outputDir}`;
-
-      /*fsExtra.ensureDirSync(dir);
-
-      images.forEach(id => {
-        fs.writeFileSync(`${dir}/${path.basename(id)}`, fs.readFileSync(id));
-      });*/
+      files.emit();
     },
   };
 }

@@ -1,11 +1,9 @@
 module.exports = {
-  cacheDirectory: '<rootDir>/jest-cache',
-  roots: ['<rootDir>/src'],
-  moduleFileExtensions: ['js'],
-  modulePaths: ['<rootDir>/src'],
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.spec.js'],
-  testEnvironment: 'jsdom',
-  transform: {
-    '^.+\\.(js|ts)$': 'babel-jest',
+  cacheDirectory: '<rootDir>/jest/cache',
+  roots: ['<rootDir>/test'],
+  moduleFileExtensions: ['js', 'ts'],
+  testMatch: ['<rootDir>/test/**/*.spec.js'],
+  moduleNameMapper: {
+    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/jest/__mocks__/imageMock.js',
   },
 };
