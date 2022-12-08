@@ -9,6 +9,7 @@ import { Files } from './Files';
 // types
 import { TPluginConfigItem } from './types';
 
+
 function createPluginFile(config: TPluginConfigItem[]): Plugin {
   const includes = config.reduce<string[]>((res, i) => res.concat(i.extensions), []).map(e => `**/*${e}`);
 
@@ -29,7 +30,7 @@ function createPluginFile(config: TPluginConfigItem[]): Plugin {
 
       Object.values(bundle).map(i => {
         if (i.type === 'chunk') {
-          files.prepareChunk(i, bundleDir);
+          files.prepareChunk(i, bundleDir, options.format);
         }
       });
       files.emit();

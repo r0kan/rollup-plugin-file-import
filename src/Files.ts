@@ -1,7 +1,7 @@
 // [libs]
 import fs from 'fs';
 import path from 'path';
-import { OutputChunk } from 'rollup';
+import {OutputChunk, OutputOptions} from 'rollup';
 
 // utils
 import { mkDirSync } from './utils';
@@ -31,9 +31,16 @@ export class Files {
     return `const file = require('#${fileInfo.path}#'); export default file;`;
   }
 
-  prepareChunk(outputChunk: OutputChunk, bundleDir: string): void {
+  prepareChunk(outputChunk: OutputChunk, bundleDir: string, format: OutputOptions['format']): void {
     this.itemsMap.forEach(fileInfo => {
       const chunkDir = path.dirname(`${bundleDir}${path.sep}${outputChunk.fileName}`);
+
+      if (format == 'es' || format === 'esm') {
+        outputChunk.code = outputChunk.code.replace(
+            `require('#${fileInfo.path}#`,
+            `import('#${fileInfo.path}#`,
+        );
+      }
 
       outputChunk.code = outputChunk.code.replace(
         `#${fileInfo.path}#`,

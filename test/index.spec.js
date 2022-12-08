@@ -7,11 +7,11 @@ const filePlugin = require('../');
 const entryDir = resolve(__dirname, 'entry');
 
 describe('rollup-plugin-file', () => {
-  it('should emit files relative file', async () => {
+  it('should emit files relative file (cjs)', async () => {
     const outputDir = resolve(__dirname, 'tmp/dist_as_file');
 
     const outputFileRollup = {
-      format: 'es',
+      format: 'cjs',
       file: `${outputDir}/output.js`,
     };
 
@@ -42,17 +42,15 @@ describe('rollup-plugin-file', () => {
     expect(outputCode.indexOf("require('./raster/image.png')") !== -1).toBe(true);
     expect(outputCode.indexOf("require('./vector/image.svg')") !== -1).toBe(true);
     expect(outputCode.indexOf("require('./raster/chunk_image.png')") !== -1).toBe(true);
-
-    /*sync(outputDir);*/
   });
 
-  it('should emit files relative dir', async () => {
+  it('should emit files relative dir (es)', async () => {
     const outputDir = resolve(__dirname, 'tmp/dist_as_dir');
 
     const outputDirRollup = {
       format: 'es',
       dir: `${outputDir}`,
-      entryFileNames: '[name].es.js',
+      entryFileNames: 'output.es.js',
       chunkFileNames: 'chunks/[name].js',
     };
 
@@ -78,6 +76,9 @@ describe('rollup-plugin-file', () => {
     expect(existsSync(`${outputDir}/raster/image.png`)).toBe(true);
     expect(existsSync(`${outputDir}/vector/image.svg`)).toBe(true);
 
-    /*sync(outputDir);*/
+    const outputCode = readFileSync(`${outputDir}/output.es.js`, { encoding: 'utf8' });
+
+    expect(outputCode.indexOf("import('./raster/image.png')") !== -1).toBe(true);
+    expect(outputCode.indexOf("import('./vector/image.svg')") !== -1).toBe(true);
   });
 });
